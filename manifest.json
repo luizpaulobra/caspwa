@@ -5,8 +5,9 @@
   "background_color": "#2196f3",
   "display": "standalone",
   "orientation": "portrait",
-  "Scope": "/caspwa/",
-  "start_url": "https://luizpaulobra.github.io/caspwa/",
+  "start_url": "index.html",
+  "background_color": "#4caf50",
+  "theme_color": "#4caf50",
   "icons": [
     {
       "src": "images/icons/icon-72x72.png",
