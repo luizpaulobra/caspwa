@@ -1,0 +1,73 @@
+<template>
+  <div class="page">
+    <div class="navbar">
+      <div class="navbar-inner sliding">
+        <div class="left">
+          <a href="#" class="link back">
+            <i class="icon icon-back"></i>
+            <span class="ios-only">Back</span>
+          </a>
+        </div>
+        <div class="title">Contato</div>
+      </div>
+    </div>
+    <div class="page-content" id="contatotmp">
+      
+    </div>
+  </div>
+</template>
+<script>
+return {
+  methods: {
+    openDemo1: function () {
+      var self = this;
+      self.actions1.open();
+    },
+  },
+  on: {
+    pageBeforeRemove: function() {
+      var self = this;
+
+    },
+    pageInit: function(page) {
+      var self = this;
+
+      var info = GoogleMap.places[this.$route.params.id];
+
+      var contatoHtml = $$('script#contatoTmp').html();
+      var contatoTmp = Template7.compile(contatoHtml);
+
+      var htmlContatoTmp = contatoTmp({
+          remetente: window.localStorage.getItem('usernome')+' ('+window.localStorage.getItem('useremail')+')',
+          destinatario: info.nome+' ('+info.email+')',
+          emaildestino: info.email
+      });
+
+      $('#linkback').attr('href','informacoes.html?id='+this.$route.params.id);
+
+      $('#contatotmp').html(htmlContatoTmp);
+
+      $('#contato_envio').on('click', function () {
+        if ($('input[name="assunto"]').val() == '' || $('textarea[name="mensagem"]').val() == '') {
+          alert('Preencha todos os campos');
+        } else {
+          app.preloader.show();
+          $.post('http://www.cas-online.org.br/app/api.php?email=sender',{assunto:$('input[name="assunto"]').val(), mensagem:$('textarea[name="mensagem"]').val(), destNome: info.nome, destEmail: info.email, remNome: window.localStorage.getItem('usernome'), remEmail: window.localStorage.getItem('useremail')}, function(data) {
+            app.preloader.hide();
+            if (data == 'ok') {
+              alert('Enviado com sucesso');
+            this.$router.back();
+            } else {
+              alert('Falha no envio, tente novamente...');
+            }
+          }).fail(function(){
+            app.preloader.hide();
+            alert('Falha no envio, verifique sua conexão e tente novamente...');
+          });
+        }
+      });
+
+    }
+  }
+}
+</script>

@@ -1,0 +1,88 @@
+<template>
+  <div class="page">
+    <div class="navbar">
+      <div class="navbar-inner sliding">
+        <div class="left">
+          <a href="#" class="link back">
+            <i class="icon icon-back"></i>
+            <span class="ios-only">Back</span>
+          </a>
+        </div>
+        <div class="title">Informações</div>
+      </div>
+    </div>
+    <div class="page-content" id="infotmp">
+      
+    </div>
+  </div>
+</template>
+<script>
+return {
+  methods: {
+    openDemo1: function () {
+      var self = this;
+      self.actions1.open();
+    },
+  },
+  on: {
+    pageBeforeRemove: function() {
+      var self = this;
+
+    },
+    pageInit: function(page) {
+      var self = this;
+
+      var pgback = '/mapa';
+
+      if ( this.$route.params.direcao == 'aeronave') {
+
+      var info2Html = $$('script#info2Tmp').html();
+      var info2Tmp = Template7.compile(info2Html);
+
+      $.getJSON('http://www.cas-online.org.br/app/api.php?acao=aeronaves&id='+ this.$route.params.id,function(info){
+
+        var htmlInfoTmp = info2Tmp({
+          prefixo: '<strong>'+info.prefixo+'</strong>',
+          modelo: '<b>Modelo:</b> '+info.modelo,
+          empresa: '<b>Empresa:</b> '+info.empresa,
+          ano: '<b>Ano:</b> '+info.anofab,
+          comb: '<b>Combustível:</b> '+info.tpcomb,
+        });
+        
+        $('#infotmp').html(htmlInfoTmp);
+
+      });
+
+      pgback = '/aeronaves';
+
+      } else {
+
+      var infoHtml = $$('script#infoTmp').html();
+      var infoTmp = Template7.compile(infoHtml);
+
+      var info = GoogleMap.places[ this.$route.params.id];
+
+      var htmlInfoTmp = infoTmp({
+          id:  this.$route.params.id,
+          title: '<strong>'+info.nome+'</strong>',
+          endereco: info.endereco,
+          cidade: info.cidade+' - '+info.estado,
+          nivel: '<u>CAS Nível '+pn(info.nivel)+'</u>',
+          email: 'E-mail: <b>'+info.email+'</b>',
+          telefone: 'Telefone: <b>'+info.telefone+'</b>',
+          telnum: info.telefone
+      });
+      $('#infotmp').html(htmlInfoTmp);
+
+      if (this.$route.params.direcao == 'listar') {
+        pgback = '/listar'
+      } 
+
+      }
+
+      //$('#btvolta').attr('href',pgback);
+
+    }
+  }
+}
+</script>

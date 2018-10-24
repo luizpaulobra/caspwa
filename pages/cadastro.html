@@ -1,0 +1,168 @@
+<template>
+  <div class="page">
+    <div class="navbar">
+      <div class="navbar-inner sliding">
+        <!-- <div class="left">
+          <a href="#" class="link back">
+            <i class="icon icon-back"></i>
+            <span class="ios-only">Back</span>
+          </a>
+        </div> -->
+        <div class="title">Cadastro</div>
+      </div>
+    </div>
+    <div class="page-content">
+      <div class="block block-strong">
+        <p>Identifique-se abaixo e nos ajude a lhe oferecer um serviço preciso e te informar sobre novidades :)</p>
+      </div>
+      <div class="list no-hairlines-md">
+      <ul>
+        <li class="item-content item-input">
+          <div class="item-media">
+            <i class="icon demo-list-icon"></i>
+          </div>
+          <div class="item-inner">
+            <div class="item-title item-label">Nome</div>
+            <div class="item-input-wrap">
+              <input type="text" name="nome" placeholder="Seu nome">
+              <span class="input-clear-button"></span>
+            </div>
+          </div>
+        </li>
+        <li class="item-content item-input">
+          <div class="item-media">
+            <i class="icon demo-list-icon"></i>
+          </div>
+          <div class="item-inner">
+            <div class="item-title item-label">E-mail</div>
+            <div class="item-input-wrap">
+              <input type="email" name="email" placeholder="Seu e-mail">
+              <span class="input-clear-button"></span>
+            </div>
+          </div>
+        </li>
+        <li class="item-content item-input">
+          <div class="item-media">
+            <i class="icon demo-list-icon"></i>
+          </div>
+          <div class="item-inner">
+            <div class="item-title item-label">Telefone</div>
+            <div class="item-input-wrap">
+              <input name="telefone" id="telefone" type="tel" placeholder="Seu telefone/celular">
+              <span class="input-clear-button"></span>
+            </div>
+          </div>
+        </li>
+        <li class="item-content item-input">
+          <div class="item-media">
+            <i class="icon demo-list-icon"></i>
+          </div>
+          <div class="item-inner">
+            <div class="item-title item-label">Cidade</div>
+            <div class="item-input-wrap">
+              <input type="text" name="cidade" placeholder="Sua cidade">
+              <span class="input-clear-button"></span>
+            </div>
+          </div>
+        </li>
+        <li class="item-content item-input">
+          <div class="item-media">
+            <i class="icon demo-list-icon"></i>
+          </div>
+          <div class="item-inner">
+            <div class="item-title item-label">Estado</div>
+            <div class="item-input-wrap input-dropdown-wrap">
+              <select name="estado" placeholder="Seu estado...">
+                  <option value="AC">Acre</option>
+                  <option value="AL">Alagoas</option>
+                  <option value="AP">Amapá</option>
+                  <option value="AM">Amazonas</option>
+                  <option value="BA">Bahia</option>
+                  <option value="CE">Ceará</option>
+                  <option value="DF">Distrito Federal</option>
+                  <option value="ES">Espirito Santo</option>
+                  <option value="GO">Goiás</option>
+                  <option value="MA">Maranhão</option>
+                  <option value="MT">Mato Grosso</option>
+                  <option value="MS">Mato Grosso do Sul</option>
+                  <option value="MG">Minas Gerais</option>
+                  <option value="PA">Pará</option>
+                  <option value="PB">Paraiba</option>
+                  <option value="PR">Paraná</option>
+                  <option value="PE">Pernambuco</option>
+                  <option value="PI">Piauí</option>
+                  <option value="RJ">Rio de Janeiro</option>
+                  <option value="RN">Rio Grande do Norte</option>
+                  <option value="RS">Rio Grande do Sul</option>
+                  <option value="RO">Rondônia</option>
+                  <option value="RR">Roraima</option>
+                  <option value="SC">Santa Catarina</option>
+                  <option value="SP">São Paulo</option>
+                  <option value="SE">Sergipe</option>
+                  <option value="TO">Tocantins</option>
+              </select>
+            </div>
+          </div>
+        </li>
+        <li>
+            <div class="item-content">
+            <button id="envio" class="button button-raised button-fill color-blue" style="width:100%;">CONTINUAR >></button>
+            </div>
+        </li>
+      </ul>
+    </div>
+    </div>
+  </div>
+</template>
+<script>
+return {
+  methods: {
+    openDemo1: function () {
+      var self = this;
+      self.actions1.open();
+    },
+  },
+  on: {
+    pageBeforeRemove: function() {
+      var self = this;
+
+    },
+    pageInit: function(page) {
+      var self = this;
+
+      setTimeout(function(){
+    apMask();
+  },800);
+
+  $$('#envio').on('click', function () {
+    if ($('input[name="nome"]').val() != '' && $('input[name="email"]').val() != '' && $('input[name="telefone"]').val() != '' && $('input[name="cidade"]').val() != '' && $('select[name="estado"]').val() != '') {
+      app.preloader.show();
+      $.post('http://www.cas-online.org.br/app/api.php?acao=cadastro',{
+        nome: $('input[name="nome"]').val(),
+        email: $('input[name="email"]').val(),
+        telefone: $('input[name="telefone"]').val(),
+        cidade: $('input[name="cidade"]').val(),
+        estado: $('select[name="estado"]').val()
+      }, function(data){
+        app.preloader.hide();
+        if (data == 'ok') {
+          window.localStorage.setItem('usernome',$('input[name="nome"]').val());
+          window.localStorage.setItem('useremail',$('input[name="email"]').val());
+          window.localStorage.setItem('usertelefone',$('input[name="telefone"]').val());
+          window.localStorage.setItem('usercidade',$('input[name="cidade"]').val());
+          window.localStorage.setItem('userestado',$('select[name="estado"]').val());
+          app.router.navigate('/mapa');
+        }
+      }).fail(function(){
+        app.preloader.hide();
+        alert('Falha no cadastro. Verifique sua conexão.');
+      });
+    } else {
+      alert('Preencha todos os campos');
+    }
+  });
+
+    }
+  }
+}
+</script>

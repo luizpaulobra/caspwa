@@ -1,0 +1,201 @@
+<template>
+  <div class="page">
+    <div class="navbar">
+      <div class="navbar-inner sliding">
+        <!-- <div class="left">
+          <a href="#" class="link back">
+            <i class="icon icon-back"></i>
+            <span class="ios-only">Back</span>
+          </a>
+        </div> -->
+        <div class="title">Mapa do CAS</div>
+      </div>
+    </div>
+    <div class="page-content">
+      <div id="map" style="width:100%;height:50%;"></div>
+      <div id="infolocal">
+      <div>
+      <p align="center">Selecione um Local no Mapa</p>
+      </div>
+    </div>
+    <div class="block">
+      <a href="/listar" class="button button-raised button-fill color-blue">EMPRESAS CERTIFICADAS</a>
+      <br>
+      <a href="/aeronaves" class="button button-raised button-fill color-blue">BUSCAR AERONAVES</a>
+    </div>
+    </div>
+  </div>
+</template>
+<script>
+return {
+  methods: {
+    openDemo1: function () {
+      var self = this;
+      self.actions1.open();
+    },
+  },
+  on: {
+    pageBeforeRemove: function() {
+      var self = this;
+
+    },
+    pageInit: function(page) {
+      var self = this;
+
+      console.log('device pronto');
+
+    var cardHtml = $$('script#cardTmp').html();
+    var cardTmp = Template7.compile(cardHtml);
+
+    GoogleMap = {
+          map: null,
+          markers: {},
+
+          init: function(lat, lng, places, pinia){
+            var self = this;
+
+            if (pinia == null) {
+              pini = '-13.439899729822633,-51.6564647469238';
+            } else {
+              pini = pinia;
+            }
+
+            var orig = pini.split(',');
+
+            $.each(places,function(kv,vv){
+              if (vv['cord'] != undefined) {
+                var dest = vv['cord'].split(',');
+                places[kv]['dist'] = haversine(orig[0],orig[1],dest[0],dest[1]);
+              } else {
+                places[kv]['dist'] = 999999;
+              }
+            });
+
+            self.places = places;
+
+            var mapOptions = {
+              zoom: (pinia == null) ? 3 : 6,
+              center: new google.maps.LatLng(lat, lng)
+            };
+
+            this.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+            //this.infowindow = new google.maps.InfoWindow({ size: new google.maps.Size(50,50) });
+
+            if (pinia != null) {
+              var val = [];
+              val.cord = pini;
+              val.icon = 'eu.png';
+              self.addMarker(999999,val);
+            }
+
+            $.each(places, function(id,val){
+              val.icon = 'casicon.png';
+              self.addMarker(id,val);
+            });
+
+            
+
+            this.setCenterPoint();
+          },
+
+          addMarker: function(id,place){
+            var self = this;
+
+            if (place.cord != undefined && place.cord != null && place.cord != '') {
+
+            var local = place.cord.split(',');
+
+            console.log(local[0]+' '+local[1]);
+
+            var marker = new google.maps.Marker({
+              position: new google.maps.LatLng(local[0],local[1]),
+              map: self.map,
+              id: id,
+              title: place.nome,
+              address: place.endereco,
+              city: place.cidade,
+              state: place.estado,
+              icon: place.icon,
+            });
+
+            /*marker.info_window_content = place.name + '<br/>' + place.address
+            self.markers[place.id] = marker*/
+
+            google.maps.event.addListener(marker, 'click', function() {
+              if (marker.id != 999999) {
+                var htmlCardTmp = cardTmp({
+                    id: marker.id,
+                    titulo: marker.title,
+                    descricao: marker.address+'<br>'+marker.city+' - '+marker.state,
+                });
+                $('#infolocal').html(htmlCardTmp);
+                self.map.setCenter(marker.getPosition());
+              }
+            });
+
+            } //if
+          },
+
+          updateMarkers: function(records){
+            var self = this;
+
+            $.each(self.markers, function(){ this.setMap(null); })
+            $.each(records, function(){
+              self.markers[this.id].setMap(self.map);
+            });
+
+            //Set map center
+            if(records.length) self.setCenterPoint();
+          },
+
+          setCenterPoint: function(){
+            var lat = 0, lng = 0; count = 0;
+
+            //Calculate approximate center point.
+            for(id in this.markers){
+              var m = this.markers[id];
+
+              if(m.map){
+                lat += m.getPosition().lat();
+                lng += m.getPosition().lng();
+                count++;
+              }
+            }
+
+            if(count > 0){
+              this.map.setCenter(new google.maps.LatLng(lat/count,lng/count));
+            }
+          }
+
+        };
+
+      app.preloader.show();
+      navigator.geolocation.getCurrentPosition(function(position) {
+        app.preloader.hide();
+        console.log('gps');
+        console.log('position');
+
+        $.get('http://www.cas-online.org.br/app/api.php', function(data){
+          console.log('loading api/map');
+          GoogleMap.init(position.coords.latitude,position.coords.longitude, $.parseJSON(data), position.coords.latitude+','+position.coords.longitude);
+        });
+
+      }, function(){
+        app.preloader.hide();
+        q = confirm('Não foi possível encontrar seu local, verifique se sua Localização (GPS) está habilitada. Deseja tentar novamente?')
+        if (q) {
+          app.router.navigate('/mapa');
+        } 
+        console.log('sem position');
+
+        $.get('http://www.cas-online.org.br/app/api.php', function(data){
+          console.log('loading api/map');
+          GoogleMap.init(-13.439899729822633,-51.6564647469238, $.parseJSON(data), null);
+        });
+
+      }, {enableHighAccuracy: true, timeout: 7000, maximumAge: 0});
+
+    }
+  }
+}
+</script>

@@ -1,0 +1,55 @@
+<template>
+  <div class="page">
+    <div class="navbar">
+      <div class="navbar-inner sliding">
+        <div class="left">
+          <a href="#" class="link back">
+            <i class="icon icon-back"></i>
+            <span class="ios-only">Back</span>
+          </a>
+        </div>
+        <div class="title">Aeronaves</div>
+      </div>
+    </div>
+    <div class="page-content">
+        <div style="background-color:#FFF;">
+              <form data-search-list=".lista" data-search-in=".item-title" class="searchbar searchbar-init">
+                <div class="searchbar-input">
+                  <input id="ipbusca" type="search" placeholder="Digite o Prefixo para buscar"/><a href="#" class="searchbar-clear"></a>
+                </div>
+              </form>
+            </div>
+            <br>
+            <div class="list simple-list searchbar-not-found">
+              <ul>
+                <li>Nenhum resultado</li>
+              </ul>
+            </div>
+        <div class="list media-list lista search-list searchbar-found" style="background-color:#FFF;margin:0;">
+          <ul class="app-list">
+          </ul>
+        </div>
+    </div>
+  </div>
+</template>
+<script>
+return {
+  methods: {
+    openDemo1: function () {
+      var self = this;
+      self.actions1.open();
+    },
+  },
+  on: {
+    pageBeforeRemove: function() {
+      var self = this;
+
+    },
+    pageInit: function(page) {
+      var self = this;
+      app.preloader.show();
+      listaAero();
+    }
+  }
+}
+</script>
