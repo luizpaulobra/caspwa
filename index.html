@@ -169,6 +169,18 @@
   <script src="js/moeda.js"></script>
   <script src="js/list.min.js"></script>
   <script src="js/jquery.mask.min.js"></script>
+  <script type="text/javascript">
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+      .register('./service-worker.js')
+      .then(function(reg) {
+          console.log('Service worker Registered');
+      })
+      .catch(function (err) {
+          console.log('erro', err);
+      });
+  }
+  </script>
 
 </body>
 </html>
